@@ -185,24 +185,43 @@ async function raceSuccess(
 
 // ── leaderboard ──────────────────────────────────────────────────────
 
-/** Strip leading numeric IDs: "495029 Aliyan Haider" → "Aliyan Haider" */
+/** Strip leading numeric IDs and normalise whitespace.
+ *  "714841  Kashan Ali " → "Kashan Ali"
+ *  "495029 Aliyan Haider" → "Aliyan Haider"
+ */
 function cleanName(raw: string): string {
-  return raw.replace(/^\d+\s+/, '').trim();
+  return raw
+    .replace(/^\d+\s+/, '')   // strip leading ID
+    .replace(/\s+/g, ' ')     // collapse any multi-spaces / tabs
+    .trim();
+}
+
+/** Normalise key for grouping (lowercase + collapsed whitespace) */
+function normaliseKey(raw: string): string {
+  return cleanName(raw).toLowerCase();
 }
 
 export function calculateLeaderboard(records: PerformanceRecord[]): LeaderboardEntry[] {
-  const map = new Map<string, { count: number; manager: string }>();
+  // Group by normalised cleaned name so slight formatting differences merge
+  const map = new Map<string, { displayName: string; count: number; manager: string }>();
 
   for (const r of records) {
-    const key = r.associate;
+    const key = normaliseKey(r.associate);
     const existing = map.get(key);
-    if (existing) existing.count++;
-    else map.set(key, { count: 1, manager: r.manager });
+    if (existing) {
+      existing.count++;
+    } else {
+      map.set(key, {
+        displayName: cleanName(r.associate),
+        count: 1,
+        manager: r.manager,
+      });
+    }
   }
 
-  const sorted = Array.from(map.entries())
-    .map(([associate, d]) => ({
-      associate: cleanName(associate),
+  const sorted = Array.from(map.values())
+    .map((d) => ({
+      associate: d.displayName,
       manager: d.manager,
       count: d.count,
       rank: 0,

@@ -178,54 +178,81 @@ export function getCurrentBusinessYear(): DateRange {
 }
 
 /**
- * Parse an Excel serial date number into a JS Date
+ * Parse an Excel serial date number into a LOCAL JS Date (noon to avoid tz drift).
  */
 export function excelDateToJSDate(serial: number): Date {
-  // Excel serial date: days since Jan 0, 1900 (with the 1900 leap year bug)
-  const utcDays = Math.floor(serial - 25569);
-  const utcValue = utcDays * 86400;
-  return new Date(utcValue * 1000);
+  // Excel serial date epoch: Jan 0, 1900 = Dec 31, 1899
+  // JS epoch: Jan 1, 1970
+  // Offset: 25569 days (includes the infamous 1900 leap-year bug)
+  const days = Math.floor(serial - 25569);
+  // Build LOCAL date at noon so timezone offsets can never shift the calendar day
+  const d = new Date(1970, 0, 1 + days, 12, 0, 0, 0);
+  return d;
 }
 
 /**
- * Parse various date formats from Excel
+ * Always return a LOCAL Date at noon so .getDate() is stable across timezones.
+ */
+function localNoon(year: number, month: number, day: number): Date {
+  return new Date(year, month, day, 12, 0, 0, 0);
+}
+
+/**
+ * Parse various date formats from Excel / CSV into a local-noon Date.
  */
 export function parseDate(value: unknown): Date | null {
   if (value === null || value === undefined || value === '') return null;
 
-  // If it's a number (Excel serial date)
+  // Already a Date object (SheetJS cellDates:true)
+  if (value instanceof Date) {
+    if (isNaN(value.getTime())) return null;
+    return localNoon(value.getFullYear(), value.getMonth(), value.getDate());
+  }
+
+  // Excel serial number
   if (typeof value === 'number') {
     return excelDateToJSDate(value);
   }
 
-  // If it's a string, try to parse it
   if (typeof value === 'string') {
     const trimmed = value.trim();
     if (!trimmed) return null;
 
-    // Try standard date parsing
-    const parsed = new Date(trimmed);
-    if (!isNaN(parsed.getTime())) return parsed;
+    // MM/DD/YYYY  or  M/D/YYYY  (US format — common in Google Sheets CSV)
+    const usMatch = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (usMatch) {
+      return localNoon(+usMatch[3], +usMatch[1] - 1, +usMatch[2]);
+    }
 
-    // Try DD/MM/YYYY format
-    const parts = trimmed.split(/[\/\-\.]/);
-    if (parts.length === 3) {
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1;
-      const year = parseInt(parts[2], 10);
-      const d = new Date(year, month, day);
-      if (!isNaN(d.getTime())) return d;
+    // DD-MM-YYYY  or  DD.MM.YYYY
+    const dmyMatch = trimmed.match(/^(\d{1,2})[\-\.](\d{1,2})[\-\.](\d{4})$/);
+    if (dmyMatch) {
+      return localNoon(+dmyMatch[3], +dmyMatch[2] - 1, +dmyMatch[1]);
+    }
+
+    // YYYY-MM-DD (ISO — common in Excel exports / Google Sheets)
+    const isoMatch = trimmed.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (isoMatch) {
+      return localNoon(+isoMatch[1], +isoMatch[2] - 1, +isoMatch[3]);
+    }
+
+    // Fallback: let JS parse, then re-normalise to local noon
+    const parsed = new Date(trimmed);
+    if (!isNaN(parsed.getTime())) {
+      return localNoon(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
     }
   }
-
-  if (value instanceof Date) return value;
 
   return null;
 }
 
+/**
+ * Compare calendar days only (both sides normalised to midnight for comparison).
+ */
 export function isDateInRange(date: Date, range: DateRange): boolean {
-  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  const s = new Date(range.start.getFullYear(), range.start.getMonth(), range.start.getDate());
-  const e = new Date(range.end.getFullYear(), range.end.getMonth(), range.end.getDate());
+  // Strip time from all three — compare pure calendar dates
+  const d = new Date(date.getFullYear(),  date.getMonth(),  date.getDate()).getTime();
+  const s = new Date(range.start.getFullYear(), range.start.getMonth(), range.start.getDate()).getTime();
+  const e = new Date(range.end.getFullYear(),   range.end.getMonth(),   range.end.getDate()).getTime();
   return d >= s && d <= e;
 }
