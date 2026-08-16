@@ -202,7 +202,7 @@ function App() {
                 </h2>
                 <p className="text-xs text-white/30">
                   {displayLeaderboard.length} performer{displayLeaderboard.length !== 1 ? 's' : ''} •{' '}
-                  {filteredRecords.length} total record{filteredRecords.length !== 1 ? 's' : ''}
+                  {filteredRecords.length} total sale{filteredRecords.length !== 1 ? 's' : ''}
                 </p>
               </div>
             </div>
