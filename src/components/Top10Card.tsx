@@ -57,7 +57,7 @@ const Top10Card: FC<Top10CardProps> = ({ entry, index }) => {
         {/* Count */}
         <div className="flex-shrink-0 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">
           <span className="text-xs font-semibold text-white/50">
-            {entry.count}
+            {entry.count} {entry.count === 1 ? 'Sale' : 'Sales'}
           </span>
         </div>
       </div>

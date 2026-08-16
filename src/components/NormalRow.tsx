@@ -31,7 +31,7 @@ const NormalRow: FC<NormalRowProps> = ({ entry }) => {
       {/* Count */}
       <div className="flex-shrink-0">
         <span className="text-xs font-medium text-white/30 group-hover:text-white/50 transition-colors">
-          {entry.count} {entry.count === 1 ? 'record' : 'records'}
+          {entry.count} {entry.count === 1 ? 'sale' : 'sales'}
         </span>
       </div>
     </div>

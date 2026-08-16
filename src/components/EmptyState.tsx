@@ -12,9 +12,9 @@ const EmptyState = () => {
         </h3>
 
         <p className="text-sm text-white/30 font-light leading-relaxed">
-          There are no qualifying performance records for this period.
+          There are no qualifying sales for this period.
           <br />
-          Data will appear once activities are recorded.
+          Data will appear once sales are recorded.
         </p>
 
         {/* Decorative stats placeholder */}

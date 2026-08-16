@@ -155,7 +155,7 @@ const PodiumCard: FC<PodiumCardProps> = ({ entry, rank, height, isHero, isMobile
       {/* Performance count */}
       <div className={`mt-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10`}>
         <span className="text-xs font-semibold text-white/60 tracking-wider">
-          {entry.count} {entry.count === 1 ? 'Record' : 'Records'}
+          {entry.count} {entry.count === 1 ? 'Sale' : 'Sales'}
         </span>
       </div>
 
