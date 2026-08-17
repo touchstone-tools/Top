@@ -13,25 +13,25 @@ const Podium: FC<PodiumProps> = ({ top3 }) => {
   const third = top3[2];
 
   return (
-    <div className="px-4 mb-10">
+    <div className="px-2 sm:px-4 mb-8 sm:mb-10">
       <div className="max-w-4xl mx-auto">
         {/* Desktop Podium Layout — items-end keeps the podium stagger */}
-        <div className="hidden md:flex items-end justify-center gap-4 lg:gap-6">
-          {/* 2nd Place — shorter via less padding */}
+        <div className="hidden md:flex items-end justify-center gap-3 lg:gap-6">
+          {/* 2nd Place */}
           {second && (
             <div className="fade-in-up stagger-2 flex-1 max-w-xs">
               <PodiumCard entry={second} rank={2} pad="py-6" />
             </div>
           )}
 
-          {/* 1st Place — tallest via more padding */}
+          {/* 1st Place — tallest */}
           {first && (
             <div className="fade-in-up stagger-1 flex-1 max-w-sm">
               <PodiumCard entry={first} rank={1} pad="py-8" isHero />
             </div>
           )}
 
-          {/* 3rd Place — shortest via least padding */}
+          {/* 3rd Place */}
           {third && (
             <div className="fade-in-up stagger-3 flex-1 max-w-xs">
               <PodiumCard entry={third} rank={3} pad="py-5" />
@@ -40,7 +40,7 @@ const Podium: FC<PodiumProps> = ({ top3 }) => {
         </div>
 
         {/* Mobile Stacked Layout */}
-        <div className="md:hidden space-y-4">
+        <div className="md:hidden space-y-3 sm:space-y-4">
           {first && (
             <div className="fade-in-up stagger-1">
               <PodiumCard entry={first} rank={1} isHero isMobile />
@@ -112,57 +112,61 @@ const PodiumCard: FC<PodiumCardProps> = ({ entry, rank, pad, isHero, isMobile })
   return (
     <div
       className={`
-        relative rounded-2xl overflow-hidden transition-all duration-500 hover:scale-[1.02]
+        relative rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-500 hover:scale-[1.02]
         bg-gradient-to-b ${config.bg} backdrop-blur-xl
         border ${config.border}
         ${config.glow}
         ${isHero ? 'shine-effect' : ''}
         ${config.shadow} shadow-xl
-        flex flex-col items-center justify-center px-6
-        ${!isMobile && pad ? pad : 'py-6'}
+        flex flex-col items-center justify-center px-3 sm:px-5 md:px-6
+        ${!isMobile && pad ? pad : 'py-4 sm:py-6'}
       `}
     >
       {/* Decorative top bar */}
       <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${config.rankBg}`} />
 
-      {/* Crown for #1 — placed inline, not overlapping */}
+      {/* Crown for #1 */}
       {isHero && (
-        <div className="text-3xl md:text-4xl mb-1 mt-1 medal-bounce">
+        <div className="text-2xl sm:text-3xl md:text-4xl mb-1 medal-bounce">
           {config.crown}
         </div>
       )}
 
       {/* Rank badge */}
-      <div className={`inline-flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-br ${config.rankBg} shadow-lg mb-3`}>
-        <span className="text-navy-950 font-black text-lg md:text-xl">#{rank}</span>
+      <div className={`inline-flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 md:w-14 md:h-14 rounded-full bg-gradient-to-br ${config.rankBg} shadow-lg mb-2 sm:mb-3`}>
+        <span className="text-navy-950 font-black text-sm sm:text-base md:text-xl">#{rank}</span>
       </div>
 
       {/* Medal */}
-      <div className={`text-3xl md:text-4xl mb-3 ${isHero ? 'medal-bounce' : ''}`}>
+      <div className={`text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-3 ${isHero ? 'medal-bounce' : ''}`}>
         {config.medal}
       </div>
 
-      {/* Associate name */}
-      <h3 className={`text-center font-bold mb-1 leading-tight ${isHero ? 'text-lg md:text-xl lg:text-2xl' : 'text-base md:text-lg'} text-white`}>
+      {/* Associate name — responsive, wraps naturally */}
+      <h3 className={`text-center font-bold mb-0.5 sm:mb-1 leading-snug break-words w-full ${
+        isHero
+          ? 'text-sm sm:text-base md:text-xl lg:text-2xl'
+          : 'text-xs sm:text-sm md:text-base lg:text-lg'
+      } text-white`}>
         {entry.associate}
       </h3>
 
       {/* Manager subtitle */}
-      <p className={`text-center text-sm ${config.text} opacity-70 font-light italic`}>
+      <p className={`text-center text-[11px] sm:text-xs md:text-sm ${config.text} opacity-70 font-light italic break-words w-full`}>
         {entry.manager}
       </p>
 
-      {/* Performance count */}
-      <div className={`mt-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10`}>
-        <span className="text-xs font-semibold text-white/60 tracking-wider">
+      {/* Sales count */}
+      <div className="mt-2 sm:mt-3 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-white/5 border border-white/10">
+        <span className="text-[10px] sm:text-xs font-semibold text-white/60 tracking-wider">
           {entry.count} {entry.count === 1 ? 'Sale' : 'Sales'}
         </span>
       </div>
 
       {/* TOP PERFORMER badge for #1 */}
       {isHero && (
-        <div className={`mt-3 px-4 py-1 rounded-full bg-gradient-to-r ${config.badge} shadow-lg`}>
-          <span className="text-[10px] md:text-xs font-black tracking-[0.2em] text-navy-950 uppercase">
+        <div className={`mt-2 sm:mt-3 px-3 sm:px-4 py-0.5 sm:py-1 rounded-full bg-gradient-to-r ${config.badge} shadow-lg`}>
+          <span className="text-[8px] sm:text-[10px] md:text-xs font-black tracking-[0.15em] sm:tracking-[0.2em] text-navy-950 uppercase">
             Top Performer
           </span>
         </div>
