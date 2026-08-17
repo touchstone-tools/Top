@@ -9,6 +9,7 @@ import LoadingSkeleton from './components/LoadingSkeleton';
 import EmptyState from './components/EmptyState';
 import ErrorState from './components/ErrorState';
 import ManagerFilter from './components/ManagerFilter';
+import Disclaimer from './components/Disclaimer';
 import {
   fetchSpreadsheetData,
   calculateLeaderboard,
@@ -266,6 +267,9 @@ function App() {
           </p>
         </footer>
       </div>
+
+      {/* Disclaimer push notification */}
+      <Disclaimer />
     </div>
   );
 }
