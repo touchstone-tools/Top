@@ -15,26 +15,26 @@ const Podium: FC<PodiumProps> = ({ top3 }) => {
   return (
     <div className="px-4 mb-10">
       <div className="max-w-4xl mx-auto">
-        {/* Desktop Podium Layout */}
+        {/* Desktop Podium Layout — items-end keeps the podium stagger */}
         <div className="hidden md:flex items-end justify-center gap-4 lg:gap-6">
-          {/* 2nd Place */}
+          {/* 2nd Place — shorter via less padding */}
           {second && (
             <div className="fade-in-up stagger-2 flex-1 max-w-xs">
-              <PodiumCard entry={second} rank={2} height="h-56" />
+              <PodiumCard entry={second} rank={2} pad="py-6" />
             </div>
           )}
 
-          {/* 1st Place */}
+          {/* 1st Place — tallest via more padding */}
           {first && (
             <div className="fade-in-up stagger-1 flex-1 max-w-sm">
-              <PodiumCard entry={first} rank={1} height="h-72" isHero />
+              <PodiumCard entry={first} rank={1} pad="py-8" isHero />
             </div>
           )}
 
-          {/* 3rd Place */}
+          {/* 3rd Place — shortest via least padding */}
           {third && (
             <div className="fade-in-up stagger-3 flex-1 max-w-xs">
-              <PodiumCard entry={third} rank={3} height="h-48" />
+              <PodiumCard entry={third} rank={3} pad="py-5" />
             </div>
           )}
         </div>
@@ -65,12 +65,12 @@ const Podium: FC<PodiumProps> = ({ top3 }) => {
 interface PodiumCardProps {
   entry: LeaderboardEntry;
   rank: 1 | 2 | 3;
-  height?: string;
+  pad?: string;
   isHero?: boolean;
   isMobile?: boolean;
 }
 
-const PodiumCard: FC<PodiumCardProps> = ({ entry, rank, height, isHero, isMobile }) => {
+const PodiumCard: FC<PodiumCardProps> = ({ entry, rank, pad, isHero, isMobile }) => {
   const configs = {
     1: {
       medal: '🥇',
@@ -116,10 +116,10 @@ const PodiumCard: FC<PodiumCardProps> = ({ entry, rank, height, isHero, isMobile
         bg-gradient-to-b ${config.bg} backdrop-blur-xl
         border ${config.border}
         ${config.glow}
-        ${!isMobile ? height || '' : ''}
         ${isHero ? 'shine-effect' : ''}
         ${config.shadow} shadow-xl
-        flex flex-col items-center justify-center p-6
+        flex flex-col items-center justify-center px-6
+        ${!isMobile && pad ? pad : 'py-6'}
       `}
     >
       {/* Decorative top bar */}
