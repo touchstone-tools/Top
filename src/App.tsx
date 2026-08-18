@@ -10,6 +10,7 @@ import EmptyState from './components/EmptyState';
 import ErrorState from './components/ErrorState';
 import ManagerFilter from './components/ManagerFilter';
 import Disclaimer from './components/Disclaimer';
+import RecentActivity from './components/RecentActivity';
 import {
   fetchSpreadsheetData,
   calculateLeaderboard,
@@ -54,6 +55,14 @@ function App() {
 
   useEffect(() => {
     loadData();
+  }, [loadData]);
+
+  // Auto-refresh every 60 seconds for live updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadData();
+    }, 60_000);
+    return () => clearInterval(interval);
   }, [loadData]);
 
   // Calculate date range for active period
@@ -268,7 +277,12 @@ function App() {
         </footer>
       </div>
 
-      {/* Disclaimer push notification */}
+      {/* Recent Activity floating notification — top left */}
+      {appState === 'ready' && (
+        <RecentActivity allRecords={allRecords} lastUpdated={lastUpdated} />
+      )}
+
+      {/* Disclaimer push notification — bottom right */}
       <Disclaimer />
     </div>
   );
