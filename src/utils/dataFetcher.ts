@@ -6,6 +6,8 @@ export interface PerformanceRecord {
   manager: string;
   associate: string;
   rawRow: unknown[];
+  rowIndex: number;         // original row position (higher = more recent)
+  firstSeenAt?: number;     // timestamp when this record was first observed
 }
 
 export interface LeaderboardEntry {
@@ -103,6 +105,7 @@ function parseBuffer(buf: ArrayBuffer, cols: ColMap): PerformanceRecord[] {
       manager: String(r[cols.manager] || '').trim(),
       associate,
       rawRow: r,
+      rowIndex: i,
     });
   }
   return records;
@@ -189,7 +192,7 @@ async function raceSuccess(
  *  "714841  Kashan Ali " → "Kashan Ali"
  *  "495029 Aliyan Haider" → "Aliyan Haider"
  */
-function cleanName(raw: string): string {
+export function cleanName(raw: string): string {
   return raw
     .replace(/^\d+\s+/, '')   // strip leading ID
     .replace(/\s+/g, ' ')     // collapse any multi-spaces / tabs
